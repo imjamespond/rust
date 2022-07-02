@@ -1,0 +1,13 @@
+{
+  "qrcode": {
+    "x": -43, "y": -497,
+    "width": 201, "height": 201
+  },
+  "pdf": {
+    "width": 531, "height": 744,
+    "margin_x": 71, "margin_y": 71,
+    "page_w": 3780, "page_h": 5156,
+    "page_size": 36,
+    "cols": 6
+  }
+}
