@@ -1,40 +1,50 @@
 use serde::{Deserialize, Serialize};
+use std::fs;
 
 // #[derive(Debug)] // have rust extend the debug trait.
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    qrcode: QRCode,
-    pdf: Pdf,
+    pub qrcode: QRCode,
+    pub pdf: Pdf,
 }
 #[derive(Serialize, Deserialize)]
 pub struct QRCode {
-    x: f64,
-    y: f64,
-    width: f64,
-    height: f64,
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
 }
 #[derive(Serialize, Deserialize)]
 pub struct Pdf {
-    page_w: f64,
-    page_h: f64,
-    width: f64,
-    height: f64,
-    margin_x: f64,
-    margin_y: f64,
-    page_size: f64,
-    cols: u32,
+    pub page_w: f64,
+    pub page_h: f64,
+    pub width: f64,
+    pub height: f64,
+    pub margin_x: f64,
+    pub margin_y: f64,
+    pub page_size: f64,
+    pub cols: u32,
+}
+
+pub fn read_config() -> Config {
+    let data = fs::read_to_string("./config.json").expect("Unable to read file");
+    let config: Config/*  serde_json::Value */ =
+        serde_json::from_str(&data).expect("JSON does not have correct format.");
+    config
+}
+
+pub fn save_config(config: &Config) {
+    let serialized = serde_json::to_string(config).unwrap();
+    fs::write("./test.config.json", serialized).ok();
 }
 
 mod tests {
 
     #[test]
     fn test_fromjson() {
-        use std::fs;
-        use super::Config;
-        let data = fs::read_to_string("./config.json").expect("Unable to read file");
-        let json: Config/*  serde_json::Value */ =
-            serde_json::from_str(&data).expect("JSON does not have correct format.");
-        let serialized = serde_json::to_string(&json).unwrap();
+        use super::read_config;
+        let config = read_config();
+        let serialized = serde_json::to_string(&config).unwrap();
         println!("serialized = {}", serialized);
     }
 
@@ -44,7 +54,7 @@ mod tests {
         use super::Pdf;
         use super::QRCode;
 
-        let pdf = Config {
+        let cfg = Config {
             qrcode: QRCode {
                 x: 1.,
                 y: 2.,
@@ -63,9 +73,7 @@ mod tests {
             },
         };
 
-        // println!("{:?}", pdf);
-
-        let serialized = serde_json::to_string(&pdf).unwrap();
-        println!("serialized = {}", serialized);
+        // println!("{:?}", cfg);
+        super::save_config(&cfg);
     }
 }
