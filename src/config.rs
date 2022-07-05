@@ -22,12 +22,13 @@ pub struct Pdf {
     pub page_h: f64,
     pub page_num_x: Option<f64>,
     pub page_num_y: Option<f64>,
-    pub page_size: f64,
+    pub page_size: u32,
     pub width: f64,
     pub height: f64,
     pub margin_x: f64,
     pub margin_y: f64,
     pub cols: u32,
+    pub size: u32, // qrcode数量
 }
 
 impl Default for QRCode {
@@ -52,10 +53,11 @@ impl Default for Pdf {
             page_w: 0.,
             page_num_x: Some(0.),
             page_num_y: Some(0.),
-            page_size: 0.,
+            page_size: 0,
             margin_x: 0.,
             margin_y: 0.,
             cols: 0,
+            size: 0,
         }
     }
 }

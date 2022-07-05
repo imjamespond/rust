@@ -1,13 +1,13 @@
 {
   "qrcode": {
-    "x": -43, "y": -497,
-    "width": 201, "height": 201
+    "x": -523, "y": -1277,
+    "width": 300, "height": 300
   },
   "pdf": {
-    "width": 531, "height": 744,
-    "margin_x": 71, "margin_y": 71,
-    "page_w": 3780, "page_h": 5156,
-    "page_size": 36,
-    "cols": 6
+    "width": 1358, "height": 1807,"size": 1,
+    "margin_x": 0, "margin_y": 0,
+    "page_w": 1358, "page_h": 1807,"page_num_x":0,"page_num_y":0,
+    "page_size": 1,
+    "cols": 1
   }
 }
