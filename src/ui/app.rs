@@ -29,7 +29,7 @@ impl eframe::App for MyApp {
             });
 
             if ui.button("保存").clicked() {
-                save_config(&self.config);
+                save_config(&self.config, "./config.json");
             }
         });
     }

@@ -6,7 +6,7 @@ use eframe;
 pub fn run(){
   let options = eframe::NativeOptions::default();
   eframe::run_native(
-      "egui example: custom font",
+      "qrcode generate",
       options,
       Box::new(|cc| {
         println!("run_native app_creator");

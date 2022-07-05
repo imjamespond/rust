@@ -2,6 +2,8 @@
 
 mod ui;
 mod config;
+mod qrcode;
+mod pdf;
 
 fn main() {
     ui::run();

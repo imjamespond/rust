@@ -2,3 +2,5 @@
 fonts
 .DS_*
 test.*
+qrcode
+node_modules
