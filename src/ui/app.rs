@@ -1,23 +1,29 @@
 use super::font::setup_custom_fonts;
 use crate::{
     config::{read_config, save_config, Config},
-    pdf::Pdf,
+    pdf, qrcode,
 };
 use eframe::egui;
 
 pub struct MyApp {
     // text: String,
     config: Config,
-    pdf: Pdf,
+    pdf: pdf::Pdf,
+    qrcode: qrcode::QRCode,
 }
 
 impl MyApp {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         setup_custom_fonts(&cc.egui_ctx);
+        let config = read_config();
+        let mut pdf = pdf::Pdf::default();
+        let qrcode = qrcode::QRCode::default();
+        pdf.set_pdf_tool_root(); // 改变当前路径，所有取相对路径在之前完成
         Self {
             // text: "Edit this text field if you want".to_owned(),
-            config: read_config(),
-            pdf: Pdf::default()
+            config,
+            pdf,
+            qrcode,
         }
     }
 }
@@ -39,7 +45,12 @@ impl eframe::App for MyApp {
                 save_config(&self.config, "./config.json");
             }
 
+            ui.label("操作");
+
             ui.horizontal(|ui| {
+                if ui.button("合成qrcode").clicked() {
+                    self.qrcode.qrcodes();
+                }
                 if self.pdf.pdf_tool_dir {
                     if ui.button("生成pdf").clicked() {
                         self.pdf.exec();
@@ -48,7 +59,7 @@ impl eframe::App for MyApp {
                     if ui.button("安装node pdf").clicked() {
                         self.pdf.npm_install();
                     }
-                } 
+                }
             });
         });
     }

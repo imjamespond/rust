@@ -1,7 +1,5 @@
 use std::env;
-use std::fs;
-use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Once;
 
@@ -10,7 +8,7 @@ static SINGLE: Once = Once::new();
 pub struct Pdf {
     pub config_file_str: String,
     pub qrcode_dir_str: String,
-    pub pdf_tool_dir: bool
+    pub pdf_tool_dir: bool,
 }
 
 impl Default for Pdf {
@@ -27,8 +25,6 @@ impl Default for Pdf {
         let qrcode_dir = self::get_abs_path(&["qrcode"]);
         let qrcode_dir_str = String::from(qrcode_dir.to_str().unwrap());
 
-        let pdf_tool_root = set_pdf_tool_root();
-
         println!("before once {:?}", std::thread::current().id());
         SINGLE.call_once(|| {
             println!("once {:?}", std::thread::current().id());
@@ -38,7 +34,7 @@ impl Default for Pdf {
         Self {
             config_file_str,
             qrcode_dir_str,
-            pdf_tool_dir: pdf_tool_root.is_ok(),
+            pdf_tool_dir: false,
         }
     }
 }
@@ -81,33 +77,34 @@ impl Pdf {
 
     pub fn npm_install(&mut self) {
         if cfg!(target_os = "windows") {
-            let npm = get_abs_path(&["node","npm.cmd"]);
+            let npm = get_abs_path(&["node", "npm.cmd"]);
             let npmcmd = npm.to_str().unwrap(); //".\\node\\npm.cmd";
             let mut the_process = Command::new("cmd")
                 // .current_dir(npmcmd)
-                .args([
-                    "/C", npmcmd,
-                    "install",
-                    ".\\pdf-tool-1.0.0.tgz",
-                ])
+                .args(["/C", npmcmd, "install", ".\\pdf-tool-1.0.0.tgz"])
                 .spawn()
                 .ok()
                 .expect("Failed to execute.");
-    
+
             // Wait for the process to exit.
             match the_process.wait() {
                 Ok(status) => println!("Finished, status of {}", status),
                 Err(e) => println!("Failed, error: {}", e),
             }
-    
+
             // Get the PID of the process.
             println!("The PID is: {}", the_process.id());
-    
-            let pdf_tool_root = self::set_pdf_tool_root();
-            self.pdf_tool_dir = pdf_tool_root.is_ok();
+
+            self.set_pdf_tool_root();
         }
     }
-    
+
+    pub fn set_pdf_tool_root(&mut self)  {
+        let pdf_tool_path = get_abs_path(&["node_modules", "pdf-tool"]);
+        let pdf_tool_root = env::set_current_dir(&pdf_tool_path);
+
+        self.pdf_tool_dir = pdf_tool_root.is_ok();
+    }
 }
 
 // fn abs_path(path: &str) -> io::Result<PathBuf> {
@@ -117,7 +114,7 @@ impl Pdf {
 //     abspath
 // }
 
-fn get_abs_path(paths: &[&str]) -> PathBuf {
+pub(crate) fn get_abs_path(paths: &[&str]) -> PathBuf {
     let mut absolute_path = env::current_dir().unwrap();
     for path in paths {
         let pathbuf = PathBuf::from(path);
@@ -149,23 +146,14 @@ fn set_env() {
     };
 }
 
-
-fn set_pdf_tool_root() -> io::Result<()>{
-    let pdf_tool_path = get_abs_path(&["node_modules", "pdf-tool"]);
-    let pdf_tool_root = env::set_current_dir(&pdf_tool_path);
-
-    pdf_tool_root
-}
-
 mod tests {
-    use std::os;
 
     #[test]
     fn test_once() {
         use super::Pdf;
 
-        let pdf1 = Pdf::default();
-        let pdf2 = Pdf::default();
+        let _pdf1 = Pdf::default();
+        let _pdf2 = Pdf::default();
     }
 
     #[test]
@@ -193,7 +181,7 @@ mod tests {
     #[test]
     fn test_npm_install() {
         use super::Pdf;
-        super::set_env(); 
+        super::set_env();
         let mut pdf1 = Pdf::default();
         pdf1.npm_install();
     }
