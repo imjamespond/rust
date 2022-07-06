@@ -3,51 +3,77 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::Once;
 
-pub fn exec() {
-    // let output = if cfg!(target_os = "windows") {
-    //     Command::new("cmd")
-    //             .args(["/C", "echo hello"])
-    //             .output()
-    //             .expect("failed to execute process")
-    // } else {
-    //     Command::new("sh")
-    //             .arg("-c")
-    //             .arg("echo hello")
-    //             .output()
-    //             .expect("failed to execute process")
-    // };
+static SINGLE: Once = Once::new();
 
-    // let hello = output.stdout;
-    // print!("{:?}", String::from_utf8_lossy(&hello));
+pub struct Pdf {
+    pub config_file_str: String,
+    pub qrcode_dir_str: String,
+}
 
-    self::set_env();
+impl Default for Pdf {
+    fn default() -> Self {
 
-    let config_file = self::abs_path("./config.json").unwrap();
-    let config_file_str = config_file.to_str().unwrap();
+        if SINGLE.is_completed() {
+            panic!("Only One Pdf Can Be Created!"); // 避免多线程 call once 调用没完成
+        }
 
-    let qrcode_dir = self::abs_path("./qrcode").unwrap();
-    let qrcode_dir_str = qrcode_dir.to_str().unwrap();
+        self::set_env();
 
-    let root = Path::new("./pdf-tool");
-    env::set_current_dir(&root).unwrap();
+        let config_file = self::abs_path("./config.json").unwrap();
+        let config_file_str = String::from(config_file.to_str().unwrap());
 
-    let mut the_process = Command::new("node")
-        .arg("src/run.js")
-        .arg(config_file_str)
-        .arg(qrcode_dir_str)
-        .spawn()
-        .ok()
-        .expect("Failed to execute.");
+        let qrcode_dir = self::abs_path("./qrcode").unwrap();
+        let qrcode_dir_str = String::from(qrcode_dir.to_str().unwrap());
 
-    // Wait for the process to exit.
-    match the_process.wait() {
-        Ok(status) => println!("Finished, status of {}", status),
-        Err(e) => println!("Failed, error: {}", e),
+        SINGLE.call_once(|| { 
+            let root = Path::new("./pdf-tool");
+            env::set_current_dir(&root).unwrap();
+        });
+
+        Self {
+            config_file_str,
+            qrcode_dir_str,
+        }
     }
+}
 
-    // Get the PID of the process.
-    println!("The PID is: {}", the_process.id());
+impl Pdf {
+    pub fn exec(&self) {
+        // let output = if cfg!(target_os = "windows") {
+        //     Command::new("cmd")
+        //             .args(["/C", "echo hello"])
+        //             .output()
+        //             .expect("failed to execute process")
+        // } else {
+        //     Command::new("sh")
+        //             .arg("-c")
+        //             .arg("echo hello")
+        //             .output()
+        //             .expect("failed to execute process")
+        // };
+
+        // let hello = output.stdout;
+        // print!("{:?}", String::from_utf8_lossy(&hello));
+
+        let mut the_process = Command::new("node")
+            .arg("src/run.js")
+            .arg(self.config_file_str.to_string())
+            .arg(self.qrcode_dir_str.to_string())
+            .spawn()
+            .ok()
+            .expect("Failed to execute.");
+
+        // Wait for the process to exit.
+        match the_process.wait() {
+            Ok(status) => println!("Finished, status of {}", status),
+            Err(e) => println!("Failed, error: {}", e),
+        }
+
+        // Get the PID of the process.
+        println!("The PID is: {}", the_process.id());
+    }
 }
 
 fn abs_path(path: &str) -> io::Result<PathBuf> {
@@ -71,7 +97,7 @@ fn set_env() {
     let node = abs_path("./node");
     if !node.is_ok() {
         println!("path is not existed.");
-        return ;
+        return;
     }
     let nodepath = node.unwrap();
     append_path(nodepath.to_str().unwrap()).unwrap();
@@ -83,10 +109,10 @@ fn set_env() {
     };
 }
 
-pub fn npm_install(){
+pub fn npm_install() {
     let mut the_process = Command::new("npm")
         .arg("install")
-        .arg("pdf-tool-1.0.0.tgz") 
+        .arg("pdf-tool-1.0.0.tgz")
         .spawn()
         .ok()
         .expect("Failed to execute.");
@@ -105,10 +131,19 @@ mod tests {
     use std::os;
 
     #[test]
-    fn test_exec() {
-        use super::exec;
+    fn test_once() {
+        use super::Pdf;
 
-        exec();
+        let pdf1 = Pdf::default();
+        let pdf2 = Pdf::default();
+    }
+
+    #[test]
+    fn test_exec() {
+        use super::Pdf;
+
+        let pdf1 = Pdf::default();
+        pdf1.exec();
     }
 
     #[test]
@@ -121,5 +156,4 @@ mod tests {
     fn test_env() {
         super::set_env();
     }
-
 }

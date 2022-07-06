@@ -1,13 +1,14 @@
 use super::font::setup_custom_fonts;
 use crate::{
     config::{read_config, save_config, Config},
-    pdf::{exec, npm_install},
+    pdf::{ Pdf, npm_install},
 };
 use eframe::egui;
 
 pub struct MyApp {
     // text: String,
     config: Config,
+    pdf: Pdf,
 }
 
 impl MyApp {
@@ -16,6 +17,7 @@ impl MyApp {
         Self {
             // text: "Edit this text field if you want".to_owned(),
             config: read_config(),
+            pdf: Pdf::default()
         }
     }
 }
@@ -39,7 +41,7 @@ impl eframe::App for MyApp {
 
             ui.horizontal(|ui| {
                 if ui.button("生成pdf").clicked() {
-                    exec();
+                    self.pdf.exec();
                 }
                 if ui.button("安装node pdf").clicked() {
                     npm_install();
