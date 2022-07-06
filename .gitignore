@@ -4,3 +4,5 @@ fonts
 test.*
 qrcode
 node_modules
+pdf-tool*
+node

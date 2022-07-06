@@ -70,7 +70,7 @@ pub fn read_config() -> Config {
 }
 
 pub fn save_config(config: &Config, config_file: &str) {
-    let serialized = serde_json::to_string(config).unwrap();
+    let serialized = serde_json::to_string_pretty(config).unwrap();
     fs::write(config_file, serialized).ok();
 }
 

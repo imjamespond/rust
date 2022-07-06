@@ -1,13 +1,23 @@
 {
   "qrcode": {
-    "x": -523, "y": -1277,
-    "width": 300, "height": 300
+    "x": -523.0,
+    "y": -1277.0,
+    "width": 300.0,
+    "height": 300.0
   },
   "pdf": {
-    "width": 1358, "height": 1807,"size": 1,
-    "margin_x": 0, "margin_y": 0,
-    "page_w": 1358, "page_h": 1807,"page_num_x":0,"page_num_y":0,
+    "padding_x": null,
+    "padding_y": null,
+    "page_w": 1358.0,
+    "page_h": 1807.0,
+    "page_num_x": 0.0,
+    "page_num_y": 0.0,
     "page_size": 1,
-    "cols": 1
+    "width": 1358.0,
+    "height": 1807.0,
+    "margin_x": 0.0,
+    "margin_y": 0.0,
+    "cols": 1,
+    "size": 1
   }
 }

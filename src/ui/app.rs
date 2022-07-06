@@ -1,7 +1,7 @@
 use super::font::setup_custom_fonts;
 use crate::{
     config::{read_config, save_config, Config},
-    pdf::{ Pdf, npm_install},
+    pdf::Pdf,
 };
 use eframe::egui;
 
@@ -26,26 +26,29 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             let Config { qrcode, pdf: _ } = &mut self.config;
-            ui.heading("qrcode 配置");
+            ui.label("qrcode 配置");
             // ui.text_edit_multiline(&mut self.text);
             ui.horizontal(|ui| {
                 ui.label("宽: ");
                 ui.add(egui::DragValue::new(&mut qrcode.width).speed(1.0));
             });
 
-            ui.heading("pdf 配置");
+            ui.label("pdf 配置");
 
             if ui.button("保存").clicked() {
                 save_config(&self.config, "./config.json");
             }
 
             ui.horizontal(|ui| {
-                if ui.button("生成pdf").clicked() {
-                    self.pdf.exec();
-                }
-                if ui.button("安装node pdf").clicked() {
-                    npm_install();
-                }
+                if self.pdf.pdf_tool_dir {
+                    if ui.button("生成pdf").clicked() {
+                        self.pdf.exec();
+                    }
+                } else {
+                    if ui.button("安装node pdf").clicked() {
+                        self.pdf.npm_install();
+                    }
+                } 
             });
         });
     }
