@@ -63,7 +63,7 @@ impl QRCode {
             }
         }
 
-        // 建立子线程处理
+        // 建立子线程处理, 每个线程对应一个mpsc多生产单消费channel, 最后主线程平均分配到多个tx=>子线程rx
         let thread_num = 4;
         let mut senders = Vec::new();
         let mut handlers = Vec::new();
