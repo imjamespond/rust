@@ -2,19 +2,19 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 
 // #[derive(Debug)] // have rust extend the debug trait.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Config {
     pub qrcode: QRCode,
     pub pdf: Pdf,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct QRCode {
-    pub x: f64,
-    pub y: f64,
-    pub width: f64,
-    pub height: f64,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Pdf {
     pub padding_x: Option<f64>,
     pub padding_y: Option<f64>,
@@ -34,10 +34,10 @@ pub struct Pdf {
 impl Default for QRCode {
     fn default() -> Self {
         QRCode {
-            x: 0.,
-            y: 0.,
-            width: 0.,
-            height: 0.,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
         }
     }
 }
