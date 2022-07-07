@@ -49,6 +49,7 @@ impl eframe::App for MyApp {
 
             ui.horizontal(|ui| {
                 if ui.button("合成qrcode").clicked() {
+                    println!("merge btn clicks");
                     self.qrcode.qrcodes();
                 }
                 if self.pdf.pdf_tool_dir {
