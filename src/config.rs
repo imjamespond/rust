@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
+use std::{fs, path::PathBuf};
+
+use crate::pdf::get_abs_path;
 
 // #[derive(Debug)] // have rust extend the debug trait.
 #[derive(Serialize, Deserialize, Clone, Copy)]
@@ -62,16 +64,17 @@ impl Default for Pdf {
     }
 }
 
-pub fn read_config() -> Config {
-    let data = fs::read_to_string("./config.json").expect("Unable to read file");
+pub fn read_config() -> (Config, PathBuf) {
+    let config_file = get_abs_path(&["config.json"]);
+    let data = fs::read_to_string(config_file.to_str().unwrap()).expect("Unable to read file");
     let config: Config/*  serde_json::Value */ =
         serde_json::from_str(&data).expect("JSON does not have correct format.");
-    config
+    (config, config_file)
 }
 
-pub fn save_config(config: &Config, config_file: &str) {
+pub fn save_config(config: &Config, config_file: &PathBuf) {
     let serialized = serde_json::to_string_pretty(config).unwrap();
-    fs::write(config_file, serialized).ok();
+    fs::write(config_file.to_str().unwrap(), serialized).ok();
 }
 
 mod tests {
@@ -79,19 +82,22 @@ mod tests {
     #[test]
     fn test_fromjson() {
         use super::read_config;
-        let config = read_config();
+        let (config, _config_file) = read_config();
         let serialized = serde_json::to_string(&config).unwrap();
         println!("serialized = {}", serialized);
     }
 
     #[test]
     fn test_tojson() {
+        use crate::pdf::get_abs_path;
+        
         let config = super::Config {
             qrcode: super::QRCode::default(),
             pdf: super::Pdf::default(),
         };
 
         // println!("{:?}", cfg);
-        super::save_config(&config, "./test.config.json");
+        let config_file = get_abs_path(&["test.config.json"]);
+        super::save_config(&config, &config_file);
     }
 }

@@ -6,8 +6,8 @@
     "height": 300
   },
   "pdf": {
-    "padding_x": null,
-    "padding_y": null,
+    "padding_x": 0.0,
+    "padding_y": 0.0,
     "page_w": 1358.0,
     "page_h": 1807.0,
     "page_num_x": 0.0,
