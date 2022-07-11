@@ -9,6 +9,13 @@ pub struct Config {
     pub qrcode: QRCode,
     pub pdf: Pdf,
 }
+
+impl Default for Config {
+    fn default() -> Self {
+        Self { qrcode: Default::default(), pdf: Default::default() }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Default)]
 pub struct QRCode {
     pub x: u32,

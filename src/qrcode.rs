@@ -6,7 +6,8 @@ use std::thread;
 use std::time::Instant;
 
 use crate::config::Config;
-use crate::pdf;
+
+use crate::util::get_abs_path;
 
 static IMG_TPL_PATH: [&str; 2] = ["qrcode", "template.jpg"];
 
@@ -18,12 +19,12 @@ pub struct QRCode {
 
 impl Default for QRCode {
     fn default() -> Self {
-        let output_dir = pdf::get_abs_path(&["qrcode", "output"]);
-        let input_dir = pdf::get_abs_path(&["qrcode", "input"]);
+        let output_dir = get_abs_path(&["qrcode", "output"]);
+        let input_dir = get_abs_path(&["qrcode", "input"]);
         Self {
             output_dir,
             input_dir,
-            img_tpl_path: pdf::get_abs_path(&IMG_TPL_PATH),
+            img_tpl_path: get_abs_path(&IMG_TPL_PATH),
         }
     }
 }

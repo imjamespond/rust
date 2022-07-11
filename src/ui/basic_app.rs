@@ -1,16 +1,21 @@
 extern crate native_windows_gui as nwg;
 use super::basic_app_ui::BasicAppUi;
 use crate::config::{read_config, save_config, Config, Pdf, QRCode};
+use crate::{pdf, qrcode};
 use std::{error::Error, path::PathBuf, rc::Rc};
 
 static PADDING: i32 = 10;
 static MARGING: i32 = 20;
 static LINE_H: i32 = 25;
 static WIDTH: i32 = 400;
+static HEIGHT: i32 = 600;
 
 #[derive(Default)]
 pub struct BasicApp {
+    config: Config,
     config_file: PathBuf,
+    pdf: pdf::Pdf,
+    qrcode: qrcode::QRCode,
 
     window: nwg::Window,
     qrcode_label: nwg::Label,
@@ -52,6 +57,9 @@ pub struct BasicApp {
     pdf_total_input: nwg::TextInput,
 
     save_config_btn: nwg::Button,
+    generate_card_btn: nwg::Button,
+    generate_pdf_btn: nwg::Button,
+    npm_install_btn: nwg::Button,
 }
 
 impl BasicApp {
@@ -92,6 +100,18 @@ impl BasicApp {
                 nwg::modal_info_message(&self.window, "", &format!("数据有误！"));
             }
         }
+    }
+
+    fn generate_card(&self) {
+        self.qrcode.qrcodes(&self.config);
+    }
+
+    fn generate_pdf(&self) {
+        self.pdf.exec();
+    }
+
+    fn install_pdf_tool(&self) {
+        self.pdf.npm_install();
     }
 
     fn say_goodbye(&self) {
@@ -150,11 +170,12 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
         let (config, config_file) = read_config();
         data.config_file = config_file;
         let Config { qrcode, pdf } = config;
+        data.pdf.set_pdf_tool_root();
 
         // Controls
         nwg::Window::builder()
             .flags(nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE)
-            .size((WIDTH, 500))
+            .size((WIDTH, HEIGHT))
             .position((300, 300))
             .title("PDF Tool")
             .build(&mut data.window)?;
@@ -533,6 +554,39 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
                 .build(&mut data.save_config_btn)?;
         }
 
+        let y = y + LINE_H + PADDING;
+
+        {
+            nwg::Button::builder()
+                .size((WIDTH - 20, 35))
+                .position((10, y))
+                .text("合成qrcode")
+                .parent(&data.window)
+                .build(&mut data.generate_card_btn)?;
+        }
+
+        let y = y + LINE_H + PADDING;
+
+        {
+            nwg::Button::builder()
+                .size((WIDTH - 20, 35))
+                .position((10, y))
+                .text("生成PDF")
+                .parent(&data.window)
+                .build(&mut data.generate_pdf_btn)?;
+        }
+
+        let y = y + LINE_H + PADDING;
+
+        {
+            nwg::Button::builder()
+                .size((WIDTH - 20, 35))
+                .position((10, y))
+                .text("安装PDF工具")
+                .parent(&data.window)
+                .build(&mut data.npm_install_btn)?;
+        }
+
         // Wrap-up
         let ui = BasicAppUi {
             inner: Rc::new(data),
@@ -547,6 +601,12 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
                     E::OnButtonClick => {
                         if &handle == &ui.save_config_btn {
                             BasicApp::save_config(&ui);
+                        } else if &handle == &ui.generate_pdf_btn {
+                            BasicApp::generate_pdf(&ui);
+                        } else if &handle == &ui.generate_card_btn {
+                            BasicApp::generate_card(&ui);
+                        } else if &handle == &ui.npm_install_btn {
+                            BasicApp::install_pdf_tool(&mut &ui);
                         }
                     }
                     E::OnWindowClose => {

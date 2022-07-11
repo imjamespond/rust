@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Once;
 
+use crate::util::get_abs_path;
+
 static SINGLE: Once = Once::new();
 
 pub struct Pdf {
@@ -19,10 +21,10 @@ impl Default for Pdf {
 
         self::set_env();
 
-        let config_file = self::get_abs_path(&["config.json"]);
+        let config_file = get_abs_path(&["config.json"]);
         let config_file_str = String::from(config_file.to_str().unwrap());
 
-        let qrcode_dir = self::get_abs_path(&["qrcode"]);
+        let qrcode_dir = get_abs_path(&["qrcode"]);
         let qrcode_dir_str = String::from(qrcode_dir.to_str().unwrap());
 
         println!("before once {:?}", std::thread::current().id());
@@ -75,7 +77,7 @@ impl Pdf {
         println!("The PID is: {}", the_process.id());
     }
 
-    pub fn npm_install(&mut self) {
+    pub fn npm_install(& self) {
         if cfg!(target_os = "windows") {
             let npm = get_abs_path(&["node", "npm.cmd"]);
             let npmcmd = npm.to_str().unwrap(); //".\\node\\npm.cmd";
@@ -95,7 +97,7 @@ impl Pdf {
             // Get the PID of the process.
             println!("The PID is: {}", the_process.id());
 
-            self.set_pdf_tool_root();
+            // self.set_pdf_tool_root();
         }
     }
 
