@@ -11,6 +11,7 @@ pub struct Pdf {
     pub config_file_str: String,
     pub qrcode_dir_str: String,
     pub pdf_tool_dir: bool,
+    pub npmcmd: String,
 }
 
 impl Default for Pdf {
@@ -27,6 +28,9 @@ impl Default for Pdf {
         let qrcode_dir = get_abs_path(&["qrcode"]);
         let qrcode_dir_str = String::from(qrcode_dir.to_str().unwrap());
 
+        let npm = get_abs_path(&["node", "npm.cmd"]);
+        let npmcmd = npm.to_str().unwrap().to_owned(); //".\\node\\npm.cmd";
+
         println!("before once {:?}", std::thread::current().id());
         SINGLE.call_once(|| {
             println!("once {:?}", std::thread::current().id());
@@ -37,6 +41,7 @@ impl Default for Pdf {
             config_file_str,
             qrcode_dir_str,
             pdf_tool_dir: false,
+            npmcmd,
         }
     }
 }
@@ -77,13 +82,11 @@ impl Pdf {
         println!("The PID is: {}", the_process.id());
     }
 
-    pub fn npm_install(& self) {
+    pub fn npm_install(&self) {
         if cfg!(target_os = "windows") {
-            let npm = get_abs_path(&["node", "npm.cmd"]);
-            let npmcmd = npm.to_str().unwrap(); //".\\node\\npm.cmd";
             let mut the_process = Command::new("cmd")
                 // .current_dir(npmcmd)
-                .args(["/C", npmcmd, "install", ".\\pdf-tool-1.0.0.tgz"])
+                .args(["/C", &self.npmcmd, "install", ".\\pdf-tool-1.0.0.tgz"])
                 .spawn()
                 .ok()
                 .expect("Failed to execute.");
@@ -101,7 +104,7 @@ impl Pdf {
         }
     }
 
-    pub fn set_pdf_tool_root(&mut self)  {
+    pub fn set_pdf_tool_root(&mut self) {
         let pdf_tool_path = get_abs_path(&["node_modules", "pdf-tool"]);
         let pdf_tool_root = env::set_current_dir(&pdf_tool_path);
 
@@ -115,7 +118,6 @@ impl Pdf {
 //     let abspath = fs::canonicalize(&pathbuf);
 //     abspath
 // }
-
 
 fn append_path(addpath: &str) -> Result<(), env::JoinPathsError> {
     if let Some(path) = env::var_os("PATH") {

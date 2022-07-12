@@ -346,22 +346,17 @@ dependencies = [
 [[package]]
 name = "native-windows-gui"
 version = "1.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1e049bccae62e28782c5eff82e0c8a4dace50b9783fe03b95447fef3172bb89"
 dependencies = [
  "bitflags",
  "lazy_static",
- "newline-converter",
  "plotters",
  "plotters-backend",
  "stretch",
  "winapi",
  "winapi-build",
 ]
-
-[[package]]
-name = "newline-converter"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6f81c2b19eebbc4249b3ca6aff70ae05bf18d6a99b7cc63cf0248774e640565"
 
 [[package]]
 name = "num-integer"
