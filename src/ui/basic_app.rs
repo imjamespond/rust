@@ -2,6 +2,7 @@ extern crate native_windows_gui as nwg;
 use super::basic_app_ui::BasicAppUi;
 use crate::config::{read_config, save_config, Config, Pdf, QRCode};
 use crate::{pdf, qrcode};
+use std::cell::RefCell;
 use std::{error::Error, path::PathBuf, rc::Rc};
 
 static PADDING: i32 = 10;
@@ -12,7 +13,7 @@ static HEIGHT: i32 = 520;
 
 #[derive(Default)]
 pub struct BasicApp {
-    config: Config,
+    config: RefCell<Config> ,
     config_file: PathBuf,
     pdf: pdf::Pdf,
     qrcode: qrcode::QRCode,
@@ -66,7 +67,7 @@ impl BasicApp {
     fn save_config(&self) {
         let rs = (|| -> Result<(), Box<dyn Error>> {
             let pdf_px = self.pdf_px_input.text().parse::<f64>()?;
-            let config = &Config {
+            let config = Config {
                 qrcode: QRCode {
                     x: self.qr_x_input.text().parse()?,
                     y: self.qr_y_input.text().parse()?,
@@ -89,7 +90,8 @@ impl BasicApp {
                     size: self.pdf_total_input.text().parse()?,
                 },
             };
-            save_config(config, &self.config_file);
+            save_config(&config, &self.config_file);
+            self.config.replace(config);
             Ok(())
         })();
         match rs {
@@ -103,7 +105,7 @@ impl BasicApp {
     }
 
     fn generate_card(&self) {
-        self.qrcode.qrcodes(&self.config);
+        self.qrcode.qrcodes(&self.config.borrow());
     }
 
     fn generate_pdf(&self) {
