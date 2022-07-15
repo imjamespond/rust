@@ -8,7 +8,7 @@ static PADDING: i32 = 10;
 static MARGING: i32 = 20;
 static LINE_H: i32 = 25;
 static WIDTH: i32 = 400;
-static HEIGHT: i32 = 600;
+static HEIGHT: i32 = 520;
 
 #[derive(Default)]
 pub struct BasicApp {
@@ -112,6 +112,8 @@ impl BasicApp {
 
     fn install_pdf_tool(&self) {
         self.pdf.npm_install();
+        nwg::modal_info_message(&self.window, "", &format!("安装完毕，请重新启动程序！"));
+        nwg::stop_thread_dispatch();
     }
 
     fn say_goodbye(&self) {
@@ -567,7 +569,7 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
 
         let y = y + LINE_H + PADDING;
 
-        {
+        if data.pdf.pdf_tool_dir {
             nwg::Button::builder()
                 .size((WIDTH - 20, 35))
                 .position((10, y))
@@ -575,10 +577,7 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
                 .parent(&data.window)
                 .build(&mut data.generate_pdf_btn)?;
         }
-
-        let y = y + LINE_H + PADDING;
-
-        {
+        else {
             nwg::Button::builder()
                 .size((WIDTH - 20, 35))
                 .position((10, y))
