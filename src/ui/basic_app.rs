@@ -106,10 +106,12 @@ impl BasicApp {
 
     fn generate_card(&self) {
         self.qrcode.qrcodes(&self.config.borrow());
+        nwg::modal_info_message(&self.window, "", &format!("操作成功！"));
     }
 
     fn generate_pdf(&self) {
         self.pdf.exec();
+        nwg::modal_info_message(&self.window, "", &format!("操作成功！"));
     }
 
     fn install_pdf_tool(&self) {
@@ -172,6 +174,7 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
         use nwg::Event as E;
 
         let (config, config_file) = read_config();
+        data.config.replace(config);
         data.config_file = config_file;
         let Config { qrcode, pdf } = config;
         data.pdf.set_pdf_tool_root();
@@ -281,7 +284,7 @@ impl nwg::NativeUi<BasicAppUi> for BasicApp {
         {
             add_label(
                 &data.window,
-                &mut &mut data.pdf_label,
+                &mut data.pdf_label,
                 (x, y),
                 150,
                 "PDF配置：",
